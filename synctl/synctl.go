@@ -50,9 +50,13 @@ func Start() {
 		}
 	}()
 
+	if sourceDsn == "" || targetDsn == "" {
+		panic("sourceDns or targetDsn is empty")
+	}
+
 	//for test start
-	sourceDsn := "root:123456@(127.0.0.1:3306)/test_source" //源库, 需要被比对的库
-	targetDsn := "root:123456@(127.0.0.1:3306)/test_target" //目标库
+	//sourceDsn := "root:123456@(127.0.0.1:3306)/test_source" //源库, 需要被比对的库
+	//targetDsn := "root:123456@(127.0.0.1:3306)/test_target" //目标库
 	//for test end
 
 	ctl.SourceSchema = NewMySchema(sourceDsn)
