@@ -51,7 +51,7 @@ func Start() {
 	}()
 
 	if sourceDsn == "" || targetDsn == "" {
-		panic("sourceDns or targetDsn is empty")
+		panic("sourceDsn or targetDsn is empty")
 	}
 
 	//for test start
