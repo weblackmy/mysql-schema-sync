@@ -166,33 +166,41 @@ func (table *MyTable) showCreateTable() (string, error) {
 	return tableSchema, nil
 }
 
-func (table *MyTable) create(ch chan execResult) {
-	table.exec(ch, table.RawShowCreateTable)
+func (table *MyTable) create() (execResult, error) {
+	return table.exec(table.RawShowCreateTable)
 }
 
-func (table *MyTable) drop(ch chan execResult) {
-	table.exec(ch, "DROP TABLE `"+table.Name+"`")
+func (table *MyTable) drop() (execResult, error) {
+	return table.exec("DROP TABLE `" + table.Name + "`")
 }
 
-func (field *MyField) add(ch chan execResult) {
-	field.Table.exec(ch, "ALTER TABLE `"+field.Table.Name+"` ADD "+field.rawQuery+";")
+func (field *MyField) add() (execResult, error) {
+	return field.Table.exec("ALTER TABLE `" + field.Table.Name + "` ADD " + field.rawQuery + ";")
 }
 
-func (field *MyField) drop(ch chan execResult) {
-	field.Table.exec(ch, "ALTER TABLE `"+field.Table.Name+"` DROP `"+field.Name+"`")
+func (field *MyField) drop() (execResult, error) {
+	return field.Table.exec("ALTER TABLE `" + field.Table.Name + "` DROP `" + field.Name + "`")
 }
 
-func (field *MyField) change(ch chan execResult) {
-	field.drop(ch)
-	field.add(ch)
-}
-
-func (table *MyTable) exec(ch chan execResult, query string) {
-	start := time.Now()
-	_, err := table.Schema.db.Exec(query)
-	if err != nil {
-		ch <- execResult{err: err}
+func (field *MyField) change() (execResult, error) {
+	var (
+		res execResult
+		err error
+	)
+	if res, err = field.drop(); err == nil {
+		res, err = field.add()
 	}
-	end := time.Now()
-	ch <- execResult{err: nil, query: query, time: end.Sub(start) / time.Millisecond}
+	return res, err
+}
+
+func (table *MyTable) exec(query string) (execResult, error) {
+	res := execResult{}
+	start := time.Now()
+	if _, err := table.Schema.db.Exec(query); err != nil {
+		return res, err
+	}
+	res.query = query
+	res.err = nil
+	res.time = time.Now().Sub(start) / time.Millisecond
+	return res, nil
 }

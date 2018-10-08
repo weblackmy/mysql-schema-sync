@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -64,38 +65,43 @@ func Start() {
 // table structure
 func (ctl *SyncCtl) structure() {
 	ctl.compareTables()
-
-	ch := make(chan execResult)
-	if len(ctl.tablesAdd) > 0 {
-		for _, table := range ctl.tablesAdd {
-			go table.create(ch)
-		}
-	}
-	if len(ctl.tablesDrop) > 0 {
-		for _, table := range ctl.tablesDrop {
-			go table.drop(ch)
-		}
+	if len(ctl.tablesAdd) == 0 || len(ctl.tablesDrop) == 0 || len(ctl.tablesChange) == 0 {
+		log.Println("Database has already synced")
+		os.Exit(0)
 	}
 
-	if len(ctl.tablesChange) > 0 {
-		for _, fa := range ctl.tablesChange {
-			switch fa.action {
-			case "add":
-				go fa.field.add(ch)
-			case "drop":
-				go fa.field.drop(ch)
-			case "change":
-				go fa.field.change(ch)
-			}
+	var (
+		res execResult
+		err error
+	)
+
+	for _, table := range ctl.tablesAdd {
+		if res, err = table.create(); err != nil {
+			panic(err)
 		}
+		showRes(res)
 	}
 
-	for res := range ch {
-		if res.err != nil {
-
-		} else {
-			flog.Printf("exec query successfully, query:%s usedTime:%d\n", res.query, res.time)
+	for _, table := range ctl.tablesDrop {
+		if res, err = table.drop(); err != nil {
+			panic(err)
 		}
+		showRes(res)
+	}
+
+	for _, fa := range ctl.tablesChange {
+		switch fa.action {
+		case "add":
+			res, err = fa.field.add()
+		case "drop":
+			res, err = fa.field.drop()
+		case "change":
+			res, err = fa.field.change()
+		}
+		if err != nil {
+			panic(err)
+		}
+		showRes(res)
 	}
 }
 
@@ -167,6 +173,14 @@ func (ctl *SyncCtl) compareFields(sourceTable *MyTable, targetTable *MyTable) {
 			ctl.tablesChange = append(ctl.tablesChange, cf)
 		}
 	}
+}
+
+func showRes(res execResult) {
+	query := res.query
+	if strings.Contains(res.query, "CREATE TABLE") {
+		query = strings.Join(strings.Split(res.query, "\n"), "")
+	}
+	flog.Printf("exec query successfully, time:%dms, query:%s\n", res.time, query)
 }
 
 func inStringSlice(str string, strSlice *[]string) bool {
