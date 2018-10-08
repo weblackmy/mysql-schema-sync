@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fuyoukache/devops/mysql-schema-sync/synctl"
+	"github.com/weblackmy/mysql-schema-sync/synctl"
 )
 
 func main() {
