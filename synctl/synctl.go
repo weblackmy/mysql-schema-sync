@@ -70,7 +70,7 @@ func Start() {
 func (ctl *SyncCtl) structure() {
 	ctl.compareTables()
 	if len(ctl.tablesAdd) == 0 || len(ctl.tablesDrop) == 0 || len(ctl.tablesChange) == 0 {
-		log.Println("Database has already synced")
+		log.Printf("Database %s h1as already synced\n", ctl.TargetSchema.dbName)
 		os.Exit(0)
 	}
 

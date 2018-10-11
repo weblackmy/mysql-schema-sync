@@ -10,6 +10,7 @@ import (
 
 type MySchema struct {
 	db     *sql.DB
+	dbName string
 	Tables []string
 }
 
@@ -72,7 +73,17 @@ func (schema *MySchema) initSchema() error {
 	if schema.Tables, err = schema.GetTables(); err != nil {
 		return err
 	}
+	schema.dbName = schema.GetDatabaseName()
 	return nil
+}
+
+//get current database name
+func (schema *MySchema) GetDatabaseName() string {
+	var (
+		dbName   string
+	)
+	schema.db.QueryRow("select DATABASE()").Scan(&dbName)
+	return dbName
 }
 
 // get tables
