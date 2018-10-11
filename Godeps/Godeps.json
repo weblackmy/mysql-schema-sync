@@ -7,6 +7,10 @@
 			"ImportPath": "github.com/go-sql-driver/mysql",
 			"Comment": "v1.4.0-5-g99ff426",
 			"Rev": "99ff426eb706cffe92ff3d058e168b278cabf7c7"
+		},
+		{
+			"ImportPath": "github.com/weblackmy/mysql-schema-sync/synctl",
+			"Rev": "d42c5fc5cf2ca93e47a5ab81568412fdf7d52273"
 		}
 	]
 }
