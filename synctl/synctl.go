@@ -50,14 +50,14 @@ func Start() {
 		}
 	}()
 
-	if sourceDsn == "" || targetDsn == "" {
-		panic("sourceDsn or targetDsn is empty")
-	}
-
 	//for test start
 	//sourceDsn := "root:123456@(127.0.0.1:3306)/test_source" //源库, 需要被比对的库
 	//targetDsn := "root:123456@(127.0.0.1:3306)/test_target" //目标库
 	//for test end
+
+	if sourceDsn == "" || targetDsn == "" {
+		panic("sourceDsn or targetDsn is empty")
+	}
 
 	ctl.SourceSchema = NewMySchema(sourceDsn)
 	ctl.TargetSchema = NewMySchema(targetDsn)
@@ -69,8 +69,9 @@ func Start() {
 // table structure
 func (ctl *SyncCtl) structure() {
 	ctl.compareTables()
-	if len(ctl.tablesAdd) == 0 || len(ctl.tablesDrop) == 0 || len(ctl.tablesChange) == 0 {
-		log.Printf("Database %s h1as already synced\n", ctl.TargetSchema.dbName)
+
+	if len(ctl.tablesAdd) == 0 && len(ctl.tablesDrop) == 0 && len(ctl.tablesChange) == 0 {
+		log.Printf("Database %s has already synced\n", ctl.TargetSchema.dbName)
 		os.Exit(0)
 	}
 
