@@ -10,7 +10,7 @@
 		},
 		{
 			"ImportPath": "github.com/weblackmy/mysql-schema-sync/synctl",
-			"Rev": "d42c5fc5cf2ca93e47a5ab81568412fdf7d52273"
+			"Rev": "c7b1674268d338095f0705fec81ab69b15d5be84"
 		}
 	]
 }
